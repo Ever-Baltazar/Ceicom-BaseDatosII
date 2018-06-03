@@ -1,0 +1,85 @@
+problema1
+*********************************************************
+select nombre_pro, precio_pro, Round((precio_pro*1.13),1)
+from producto
+*********************************************************
+problema2
+***************************************************************************************************
+select nombre_cli, appaterno_cli,Date_part('year',now()::date)-Date_part('year',fechanac_cli::date)
+from cliente
+***************************************************************************************************
+problema3
+*********************************************************************************************
+select nombre_prov, count(ci_cli) as cantidad
+from proveedor as prov, cliente as cli, producto as pro, producto_cliente as pc
+where cli.ci_cli=pc.ci_cli1 and pc.codigo_pro1=pro.codigo_pro and pro.nit_prov1=prov.nit_prov
+group by nombre_prov
+order by cantidad desc
+*********************************************************************************************
+problema4
+*********************************************************************************************
+select nombre_cli,Date_part('year',now()::date)-Date_part('year',fechanac_cli::date) as edad
+from cliente
+where (Date_part('year',now()::date)-Date_part('year',fechanac_cli::date)) between 25 and 30;
+*********************************************************************************************
+problema5
+***************************************************
+alter table producto_cliente add fecha_compra date;
+Update producto_clinte set fecha_compra=now();
+***************************************************
+problema6
+****************************************
+Update cliente set apmaterno_cli='Pardo'
+where ci_cli=268874;
+****************************************
+problema7
+**************************************************
+select nombre_cli, appaterno_cli, apmaterno_cli
+from cliente
+Union
+select nombre_prov, appaterno_prov, apmaterno_prov
+from proveedor;
+**************************************************
+problema8_1
+***********************************************************************************
+select nombre_cli, nombre_pro, precio_pro
+from cliente inner join producto_cliente on producto_cliente.ci_cli1=cliente.ci_cli 
+	inner join producto on producto.codigo_pro=producto_cliente.codigo_pro1
+where precio_pro < 50;
+***********************************************************************************
+problema8_2
+***************************************************************************
+select nombre_prov,appaterno_prov, nombre_pro, precio_pro
+from proveedor inner join producto on proveedor.nit_prov=producto.nit_prov1
+where nombre_prov='Carlos';
+***************************************************************************
+problema8_3
+***********************************************************************************
+select nombre_cli, avg(precio_pro) as promedio_comprado
+from cliente inner join producto_cliente on producto_cliente.ci_cli1=cliente.ci_cli 
+	inner join producto on producto.codigo_pro=producto_cliente.codigo_pro1
+where nombre_cli='Ruben' and appaterno_cli='Carpio'
+group by nombre_cli,appaterno_cli
+***********************************************************************************
+problema9
+**************************************************************************
+select nombre_prov,appaterno_prov, nombre_pro, precio_pro, nombre_pro
+from proveedor left join producto on proveedor.nit_prov=producto.nit_prov1
+**************************************************************************
+problema10
+**************************************************************************
+select nombre_prov,appaterno_prov
+from proveedor left join producto on proveedor.nit_prov=producto.nit_prov1
+where nombre_pro is null;
+**************************************************************************
+problema11
+***************************************************************************
+select nombre_prov,appaterno_prov,nombre_pro
+from proveedor right join producto on proveedor.nit_prov=producto.nit_prov1
+***************************************************************************
+problema12
+***************************************************************************
+select nombre_prov,appaterno_prov,nombre_pro
+from producto left join proveedor on proveedor.nit_prov=producto.nit_prov1
+
+

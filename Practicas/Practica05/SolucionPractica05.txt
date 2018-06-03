@@ -1,0 +1,73 @@
+Problema 1
+******************************
+select nombre_pro, precio_pro 
+from producto 
+where precio_pro > (
+    select avg(precio_pro) 
+    from producto);
+******************************
+Problema 2
+********************************************************************************
+select * 
+from producto 
+where precio_pro > all(
+    select precio_pro 
+    from producto inner join  proveedor on producto.nit_prov1=proveedor.nit_prov
+    where nombre_prov='Carlos' and appaterno_prov='Duran');
+********************************************************************************
+Problema 3
+***********************************************************************************
+select nombre_prov
+from (select nombre_prov, count(nit_prov1) as cant
+	from producto inner join proveedor on producto.nit_prov1=proveedor.nit_prov
+	group by nombre_prov, nit_prov1)as tabla2
+where cant = (select max(tabla1.cantidad)
+				from (select count(nit_prov1) as cantidad
+				from producto
+				group by nit_prov1) as tabla1)
+***********************************************************************************
+Problema 4
+*******************************************************************************************
+select nombre_cli, appaterno_cli
+from (select nombre_cli,appaterno_cli, count(ci_cli) as cant
+	from cliente inner join producto_cliente on cliente.ci_cli=producto_cliente.ci_cli1
+	group by nombre_cli,appaterno_cli, ci_cli)as tabla2
+where cant = (select min(tabla1.cantidad)
+				from (select count(ci_cli1) as cantidad
+				from producto_cliente
+				group by ci_cli1) as tabla1)
+*******************************************************************************************
+Problema 5
+*************************************************************
+select nombre_cli, round(avg(precio_pro),3)
+from cliente inner join producto_cliente on ci_cli=ci_cli1
+		inner join producto on codigo_pro=codigo_pro1
+where fecha_compra>='2018-01-01' and fecha_compra<= now()
+group by nombre_cli, ci_cli
+*************************************************************
+Problema 6
+******************************************************
+select nombre_cli, appaterno_cli
+from cliente
+where ci_cli not in (select ci_cli1 from producto_cliente)
+******************************************************
+Problema 7
+******************************************************************************************
+update producto set precio_pro=precio_pro+10 where nit_prov1= 
+(select nit_prov from proveedor where nombre_prov='Carlos' and appaterno_prov='Orellana');
+******************************************************************************************
+Problema 8
+******************************************************************************************
+select * into zarsuri_productos 
+from producto 
+where nit_prov1 = (select nit_prov 
+			from proveedor 
+			where nombre_prov='Sebastian' and appaterno_prov='Zarsuri');
+******************************************************************************************
+Problema 9
+****************************************
+delete from producto where precio_pro=7; 
+****************************************
+
+
+

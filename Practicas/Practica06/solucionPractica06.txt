@@ -1,0 +1,107 @@
+problema2
+******************************************************************************************************************************************************
+create table bitacora_cliente(numero serial,ci_cli int, fecha date,hora time, tipo_registro varchar(10), usuario varchar(10));
+
+create or replace function update_bitacora_cliente() returns trigger as 
+$$
+    begin
+		insert into bitacora_cliente(ci_cli,fecha,hora,tipo_registro,usuario) values(new.ci_cli,current_date,current_time,Tg_op,current_user);
+    return null;
+    end;
+$$language plpgsql;
+
+create trigger bit_cliente_au after update on cliente for each row execute procedure
+update_bitacora_cliente();
+
+create or replace function insert_bitacora_cliente() returns trigger as 
+$$
+    begin
+		insert into bitacora_cliente(ci_cli,fecha,hora,tipo_registro,usuario) values(new.ci_cli,current_date,current_time,Tg_op,current_user);
+    return null;
+    end;
+$$language plpgsql;
+
+create trigger bit_cliente_ia after insert on cliente for each row execute procedure
+insert_bitacora_cliente();
+
+create or replace function delete_bitacora_cliente() returns trigger as 
+$$
+    begin
+		insert into bitacora_cliente(ci_cli,fecha,hora,tipo_registro,usuario) values(old.ci_cli,current_date,current_time,Tg_op,current_user);
+    return null;
+    end;
+$$language plpgsql;
+
+create trigger bit_cliente_da after delete on cliente for each row execute procedure
+delete_bitacora_cliente();
+******************************************************************************************************************************************************
+problema 1 y 3 es igual al problema 2
+***************************************
+problema 4
+******************************************************************************************************************************************************
+create or replace function negativo_numcasa_prov() returns trigger as 
+$$
+	declare
+    	tipo varchar(10):=tg_op;
+    begin
+		if new.dir_numcasa_prov <= 0 then 
+raise exception 'El valor % no se puede ingresar porque es negativo',new.dir_numcasa_prov;
+        else
+        	if upper(tipo) = 'INSERT' then
+            	raise notice 'El valor trigger % --> La fila se ingresó correctamente', tg_name;
+            else
+            	raise notice 'El valor trigger % --> La fila se actualizo correctamente', tg_name;
+           	end if;
+        end if;
+    return new;
+    end;
+$$language plpgsql;
+
+create trigger tri_validar_numcasa_prov after insert or update on proveedor for each row execute procedure negativo_numcasa_prov();
+
+******************************************************************************************************************************************************
+problema5
+******************************************************************************************************************************************************
+Date_part('year',now()::date)-Date_part('year',fechanac_cli::date)
+create or replace function edad_menor18_cli() returns trigger as 
+$$
+	declare
+    	tipo varchar(10):=tg_op;
+    begin
+		if Date_part('year',now()::date)-Date_part('year',new.fechanac_cli::date) <= 18 then 
+raise exception 'La edad del clinte es: % ,no puede ser menor a 18',Date_part('year',now()::date)-Date_part('year',new.fechanac_cli::date);
+        else
+        	if upper(tipo) = 'INSERT' then
+            	raise notice 'El valor trigger % --> La fila se ingresó correctamente', tg_name;
+            else
+            	raise notice 'El valor trigger % --> La fila se actualizo correctamente', tg_name;
+           	end if;
+        end if;
+    return new;
+    end;
+$$language plpgsql;
+
+create trigger tri_edad_menor_cli after insert or update on cliente for each row execute procedure edad_menor18_cli();
+********************************************************************************************************************************************************
+problema6
+********************************************************************************************************************************************************
+create or replace function no_borrar_prov2587() returns trigger as 
+$$
+	declare
+    	tipo varchar(10):=tg_op;
+    begin
+		if new.nit_pro = 2587 then 
+raise exception 'El proveedor con nit: % ,no esta permito borrar',new.nit_pro;
+        else
+        	if upper(tipo) = 'DELETE' then
+            	raise notice 'El valor trigger % --> La fila se borro correctamente', tg_name;
+            else
+            	raise notice 'El valor trigger % --> La fila se actualizo correctamente', tg_name;
+           	end if;
+        end if;
+    return new;
+    end;
+$$language plpgsql;
+
+create trigger tri_no_borrar_prov2587 after delete or update on proveedor for each row execute procedure no_borrar_prov2587();
+********************************************************************************************************************************************************
